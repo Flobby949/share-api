@@ -5,9 +5,12 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import top.flobby.share.common.enums.BusinessExceptionEnum;
 import top.flobby.share.common.exception.BusinessException;
+import top.flobby.share.common.util.SnowUtil;
 import top.flobby.share.user.domain.dto.LoginDTO;
 import top.flobby.share.user.domain.entity.User;
 import top.flobby.share.user.mapper.UserMapper;
+
+import java.util.Date;
 
 /**
  * @author : Flobby
@@ -34,7 +37,9 @@ public class UserService {
      */
     public User login(LoginDTO loginDTO) {
         // 手机号查找用户
-        User savedUser = userMapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getPhone, loginDTO.getPhone()));
+        User savedUser = userMapper.selectOne(new QueryWrapper<User>()
+                .lambda()
+                .eq(User::getPhone, loginDTO.getPhone()));
         // 没有此用户
         if (savedUser == null) {
             throw new BusinessException(BusinessExceptionEnum.PHONE_NOT_EXIST);
@@ -45,5 +50,35 @@ public class UserService {
         }
         // 登录成功
         return savedUser;
+    }
+
+    /**
+     * 注册
+     *
+     * @param loginDTO dto
+     * @return {@link Long}
+     */
+    public Long register(LoginDTO loginDTO) {
+        // 手机号查找用户
+        User savedUser = userMapper.selectOne(new QueryWrapper<User>()
+                .lambda()
+                .eq(User::getPhone, loginDTO.getPhone()));
+        // 手机号已被注册
+        if (savedUser != null) {
+            throw new BusinessException(BusinessExceptionEnum.PHONE_EXIST);
+        }
+        User newUser = User.builder()
+                .id(SnowUtil.getSnowflakeNextId())
+                .phone(loginDTO.getPhone())
+                .password(loginDTO.getPassword())
+                .nickname("New User")
+                .roles("user")
+                .avatarUrl("https://i2.100024.xyz/2023/10/07/kh58mh.webp")
+                .bonus(100)
+                .createTime(new Date())
+                .updateTime(new Date())
+                .build();
+        userMapper.insert(newUser);
+        return newUser.getId();
     }
 }

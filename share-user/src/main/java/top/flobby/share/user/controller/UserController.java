@@ -32,4 +32,9 @@ public class UserController {
         return CommonResp.success(userService.login(loginDTO));
     }
 
+    @PostMapping("register")
+    public CommonResp<Long> register(@Valid @RequestBody LoginDTO loginDTO) {
+        return CommonResp.success(userService.register(loginDTO));
+    }
+
 }

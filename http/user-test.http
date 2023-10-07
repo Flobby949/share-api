@@ -18,3 +18,12 @@ Content-Type: application/json
   "phone": "18962521753",
   "password": "123123"
 }
+
+### 注册测试
+POST http://localhost:8000/user-service/user/register
+Content-Type: application/json
+
+{
+  "phone": "18962526666",
+  "password": "123123"
+}
