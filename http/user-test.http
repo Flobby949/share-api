@@ -9,3 +9,12 @@ Accept: application/json
 ### 数量测试
 GET http://localhost:8000/user-service/user/count
 Accept: application/json
+
+### 登录测试
+POST http://localhost:8000/user-service/user/login
+Content-Type: application/json
+
+{
+  "phone": "18962521753",
+  "password": "123123"
+}
