@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import top.flobby.share.common.resp.CommonResp;
 import top.flobby.share.user.domain.dto.LoginDTO;
-import top.flobby.share.user.domain.entity.User;
+import top.flobby.share.user.domain.vo.UserLoginVO;
 import top.flobby.share.user.service.UserService;
 
 /**
@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping("login")
-    public CommonResp<User> login(@Valid @RequestBody LoginDTO loginDTO) {
+    public CommonResp<UserLoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         return CommonResp.success(userService.login(loginDTO));
     }
 

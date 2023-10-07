@@ -5,9 +5,11 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import top.flobby.share.common.enums.BusinessExceptionEnum;
 import top.flobby.share.common.exception.BusinessException;
+import top.flobby.share.common.util.JwtUtil;
 import top.flobby.share.common.util.SnowUtil;
 import top.flobby.share.user.domain.dto.LoginDTO;
 import top.flobby.share.user.domain.entity.User;
+import top.flobby.share.user.domain.vo.UserLoginVO;
 import top.flobby.share.user.mapper.UserMapper;
 
 import java.util.Date;
@@ -33,9 +35,9 @@ public class UserService {
      * 登录
      *
      * @param loginDTO dto
-     * @return {@link User}
+     * @return {@link UserLoginVO}
      */
-    public User login(LoginDTO loginDTO) {
+    public UserLoginVO login(LoginDTO loginDTO) {
         // 手机号查找用户
         User savedUser = userMapper.selectOne(new QueryWrapper<User>()
                 .lambda()
@@ -49,7 +51,12 @@ public class UserService {
             throw new BusinessException(BusinessExceptionEnum.PASSWORD_ERROR);
         }
         // 登录成功
-        return savedUser;
+        String token = JwtUtil.createToken(savedUser.getId(), savedUser.getPhone());
+
+        return UserLoginVO.builder()
+                .user(savedUser)
+                .token(token)
+                .build();
     }
 
     /**
