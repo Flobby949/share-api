@@ -2,4 +2,8 @@
 GET http://localhost:8001/user-service/hello
 Accept: application/json
 
+## 网关测试
 ###
+
+GET http://localhost:8000/user-service/hello
+Accept: application/json
