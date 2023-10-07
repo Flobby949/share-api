@@ -2,6 +2,7 @@ package top.flobby.share.user.controller;
 
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
+import top.flobby.share.common.resp.CommonResp;
 import top.flobby.share.user.domain.dto.LoginDTO;
 import top.flobby.share.user.domain.entity.User;
 import top.flobby.share.user.service.UserService;
@@ -21,13 +22,13 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("count")
-    public Long count() {
-        return userService.count();
+    public CommonResp<Long> count() {
+        return CommonResp.success(userService.count());
     }
 
     @PostMapping("login")
-    public User login(@RequestBody LoginDTO loginDTO) {
-        return userService.login(loginDTO);
+    public CommonResp<User> login(@RequestBody LoginDTO loginDTO) {
+        return CommonResp.success(userService.login(loginDTO));
     }
 
 }
