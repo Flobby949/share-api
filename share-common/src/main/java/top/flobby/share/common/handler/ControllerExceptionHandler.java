@@ -1,6 +1,7 @@
 package top.flobby.share.common.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -42,6 +43,13 @@ public class ControllerExceptionHandler {
     public CommonResp<Object> exceptionHandler(BusinessException e) {
         log.error("业务异常:", e);
         return CommonResp.error(e.getE().getDesc());
+    }
+
+    @ResponseBody
+    @ExceptionHandler(BindException.class)
+    public CommonResp<Object> exceptionHandler(BindException e) {
+        log.error("校验: {}", e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return CommonResp.error(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 
 }
