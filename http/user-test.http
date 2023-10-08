@@ -9,7 +9,7 @@ Accept: application/json
 ### 数量测试
 GET http://localhost:8000/user-service/user/count
 Accept: application/json
-token: 11111
+token: {{token}}
 
 ### 登录测试
 POST http://localhost:8000/user-service/user/login
@@ -19,6 +19,10 @@ Content-Type: application/json
   "phone": "18962521753",
   "password": "123123"
 }
+
+> {%
+ client.global.set("token", response.body.data.token)
+ %}
 
 ### 注册测试
 POST http://localhost:8000/user-service/user/register

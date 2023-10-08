@@ -29,7 +29,7 @@ public class JwtUtil {
     public static String createToken(Long id, String phone) {
         DateTime now = DateTime.now();
         // 超时时间
-        DateTime expTime = now.offsetNew(DateField.SECOND, 7200);
+        DateTime expTime = now.offsetNew(DateField.HOUR, 48);
         Map<String, Object> payload = new HashMap<>();
         // 签发时间
         payload.put(RegisteredPayload.ISSUED_AT, now);
