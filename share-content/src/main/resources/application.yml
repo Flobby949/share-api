@@ -1,0 +1,16 @@
+server:
+  port: 8002
+  servlet:
+    context-path: /content-service
+
+spring:
+  application:
+    name: share-user
+  datasource:
+    url: jdbc:mysql://rm-cn-4xl3e1zjr00016fo.rwlb.rds.aliyuncs.com:3306/content_center?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: Jcx@@123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+logging:
+  level:
+    top.mqxu.share.user.mapper: debug

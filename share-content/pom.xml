@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>share-user</artifactId>
+    <artifactId>share-content</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

@@ -1,10 +1,9 @@
 package top.flobby.share.user.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
+import top.flobby.share.common.annotation.ShareApiApplication;
 
 /**
  * @author : Flobby
@@ -14,8 +13,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  **/
 
 @Slf4j
-@SpringBootApplication(scanBasePackages = {"top.flobby"})
-@MapperScan("top.flobby.share.*.mapper")
+@ShareApiApplication
 public class ShareUserApplication {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(ShareUserApplication.class);
