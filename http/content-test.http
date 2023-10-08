@@ -2,4 +2,6 @@
 GET http://localhost:8000/content-service/share/notice
 Accept: application/json
 
-###
+### 列表查询测试
+GET http://localhost:8000/content-service/share/list
+Accept: application/json
