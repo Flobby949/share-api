@@ -1,12 +1,11 @@
 package top.flobby.share.content.controller;
 
+import cn.hutool.json.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.flobby.share.common.resp.CommonResp;
+import top.flobby.share.common.util.JwtUtil;
 import top.flobby.share.content.domain.entity.Notice;
 import top.flobby.share.content.domain.entity.Share;
 import top.flobby.share.content.service.NoticeService;
@@ -31,13 +30,38 @@ public class ShareController {
     @Resource
     private ShareService shareService;
 
+    private final int MAX = 100;
+
     @GetMapping("notice")
     public CommonResp<Notice> getLatestNotice() {
         return CommonResp.success(noticeService.getLatestNotice());
     }
 
     @GetMapping("list")
-    public CommonResp<List<Share>> getShareList(@RequestParam(required = false) String title) {
-        return CommonResp.success(shareService.getList(title, 1L));
+    public CommonResp<List<Share>> getShareList(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false, defaultValue = "3") Integer pageSize,
+            @RequestHeader(required = false, value = "token") String token
+                                                ) {
+        if (pageSize > MAX) {
+            pageSize = MAX;
+        }
+        return CommonResp.success(shareService.getList(title,pageNo,pageSize, getUserIdFromToken(token)));
     }
+
+    private long getUserIdFromToken(String token) {
+        long userId = 0;
+        String noToken = "no-token";
+        if (!noToken.equals(token)) {
+            JSONObject tokenObject = JwtUtil.getJSONObject(token);
+            log.info("解析到的 token 数据为：{}", tokenObject);
+            userId = tokenObject.getLong("id");
+        } else {
+            log.info("没有 token");
+        }
+        return userId;
+    }
+
+
 }

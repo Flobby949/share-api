@@ -3,6 +3,7 @@ package top.flobby.share.content.service;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class ShareService {
      * @param userId userId
      * @return {@link List}<{@link Share}>
      */
-    public List<Share> getList(String title, Long userId) {
+    public List<Share> getList(String title, Integer pageNo, Integer pageSize, Long userId) {
         // 构造查询条件
         LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
         // 按照 id 降序查询所有数据
@@ -48,8 +49,12 @@ public class ShareService {
         }
         // 过滤出所有已经通过审核的数据并需要显示的数据
         wrapper.eq(Share::getAuditStatus, AuditStatusEnum.PASSED.getDesc()).eq(Share::getShowFlag, true);
+
+        // 分页器
+        Page<Share> page = Page.of(pageNo, pageSize);
+
         // 执行按条件查询
-        List<Share> shares = shareMapper.selectList(wrapper);
+        List<Share> shares = shareMapper.selectList(page, wrapper);
         log.info(shares + "");
         // 处理后的 Share 数据列表
         List<Share> sharesDeal;
