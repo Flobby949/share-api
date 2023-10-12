@@ -2,36 +2,34 @@ server:
   port: 8000
 
 spring:
-  application:
-    name: gateway-service
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-      routes:
-        - id: route-user
-          uri: lb://user-service
-          predicates:
-            - Path=/user-service/**
-        - id: route-content
-          uri: lb://content-service
-          predicates:
-            - Path=/content-service/**
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            # 允许请求来源
-            allowedOriginPatterns: "*"
-            # 允许携带的头信息
-            allowedHeaders: "*"
-            # 允许请求方式
-            allowedMethods: "*"
-            # 是否允许携带 cookie
-            allowCredentials: "true"
-            # 跨域检测有效期，会发起一个 OPTION 请求
-            maxAge: "3600"
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
-        namespace: dev
+#  cloud:
+#    gateway:
+#      discovery:
+#        locator:
+#          enabled: true
+#      routes:
+#        - id: route-user
+#          uri: lb://user-service
+#          predicates:
+#            - Path=/user-service/**
+#        - id: route-content
+#          uri: lb://content-service
+#          predicates:
+#            - Path=/content-service/**
+#      globalcors:
+#        cors-configurations:
+#          '[/**]':
+#            # 允许请求来源
+#            allowedOriginPatterns: "*"
+#            # 允许携带的头信息
+#            allowedHeaders: "*"
+#            # 允许请求方式
+#            allowedMethods: "*"
+#            # 是否允许携带 cookie
+#            allowCredentials: "true"
+#            # 跨域检测有效期，会发起一个 OPTION 请求
+#            maxAge: "3600"
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+#        namespace: dev

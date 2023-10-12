@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: user-service
+  cloud:
+    nacos:
+      discovery:
+        namespace: dev
+        server-addr: 127.0.0.1:8848
+      config:
+        namespace: dev
+        server-addr: 127.0.0.1:8848
+        file-extension: yml
+        refresh-enabled: true

@@ -119,7 +119,7 @@ public class ShareService {
             return share;
         }
         // 判断用户积分是否足够兑换
-        if (user.getBonus() < share.getBuyCount()) {
+        if (user.getBonus() < share.getPrice()) {
             throw new IllegalArgumentException("用户积分不足！");
         }
         // 更新用户积分
