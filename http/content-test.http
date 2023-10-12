@@ -6,3 +6,8 @@ Accept: application/json
 GET http://localhost:8000/content-service/share/list?pageSize=1
 Accept: application/json
 token: {{ token }}
+
+### 查询资源信息
+GET http://localhost:8000/content-service/share/1
+Accept: application/json
+token: {{ token }}

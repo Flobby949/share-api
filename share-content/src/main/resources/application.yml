@@ -1,16 +1,21 @@
 server:
   port: 8002
-  servlet:
-    context-path: /content-service
+#  servlet:
+#    context-path: /content-service
 
 spring:
   application:
-    name: share-content
+    name: content-service
   datasource:
     url: jdbc:mysql://rm-cn-4xl3e1zjr00016fo.rwlb.rds.aliyuncs.com:3306/content_center?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
     password: Jcx@@123
     driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: dev
 logging:
   level:
-    top.mqxu.share.user.mapper: debug
+    top.flobby.share.user.mapper: debug

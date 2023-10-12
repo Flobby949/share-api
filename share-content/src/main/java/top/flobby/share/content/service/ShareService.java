@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import top.flobby.share.common.enums.AuditStatusEnum;
 import top.flobby.share.content.domain.entity.MidUserShare;
 import top.flobby.share.content.domain.entity.Share;
+import top.flobby.share.content.domain.vo.ShareVO;
+import top.flobby.share.content.feign.UserService;
+import top.flobby.share.content.feign.model.User;
 import top.flobby.share.content.mapper.MidUserShareMapper;
 import top.flobby.share.content.mapper.ShareMapper;
 
@@ -30,6 +33,8 @@ public class ShareService {
     private ShareMapper shareMapper;
     @Resource
     private MidUserShareMapper midUserShareMapper;
+    @Resource
+    private UserService userService;
 
     /**
      * 查询用户可查看的资源列表
@@ -76,6 +81,16 @@ public class ShareService {
             }).toList();
         }
         return sharesDeal;
+    }
+
+    public ShareVO getShareById(Long id) {
+        Share share = shareMapper.selectById(id);
+        User publisher = userService.getUserById(share.getUserId()).getData();
+        return ShareVO.builder()
+                .share(share)
+                .nickname(publisher.getNickname())
+                .avatarUrl(publisher.getAvatarUrl())
+                .build();
     }
 
 }

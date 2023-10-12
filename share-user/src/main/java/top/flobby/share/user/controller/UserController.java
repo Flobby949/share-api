@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import top.flobby.share.common.resp.CommonResp;
 import top.flobby.share.user.domain.dto.LoginDTO;
+import top.flobby.share.user.domain.entity.User;
 import top.flobby.share.user.domain.vo.UserLoginVO;
 import top.flobby.share.user.service.UserService;
 
@@ -37,4 +38,8 @@ public class UserController {
         return CommonResp.success(userService.register(loginDTO));
     }
 
+    @GetMapping("{id}")
+    public CommonResp<User> getUserById(@PathVariable Long id) {
+        return CommonResp.success(userService.getUserById(id));
+    }
 }

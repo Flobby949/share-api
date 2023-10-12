@@ -2,6 +2,7 @@ package top.flobby.share.common.annotation;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import java.lang.annotation.*;
 
@@ -18,5 +19,6 @@ import java.lang.annotation.*;
 @Inherited
 @MapperScan("top.flobby.share.*.mapper")
 @SpringBootApplication(scanBasePackages = {"top.flobby"})
+@EnableFeignClients(basePackages = {"top.flobby"})
 public @interface ShareApiApplication {
 }

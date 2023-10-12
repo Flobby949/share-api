@@ -88,4 +88,8 @@ public class UserService {
         userMapper.insert(newUser);
         return newUser.getId();
     }
+
+    public User getUserById(Long id) {
+        return userMapper.selectById(id);
+    }
 }
