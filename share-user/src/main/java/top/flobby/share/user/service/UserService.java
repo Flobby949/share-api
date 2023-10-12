@@ -3,13 +3,17 @@ package top.flobby.share.user.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.flobby.share.common.enums.BusinessExceptionEnum;
 import top.flobby.share.common.exception.BusinessException;
 import top.flobby.share.common.util.JwtUtil;
 import top.flobby.share.common.util.SnowUtil;
 import top.flobby.share.user.domain.dto.LoginDTO;
+import top.flobby.share.user.domain.dto.UpdateBonusDTO;
+import top.flobby.share.user.domain.entity.BonusEventLog;
 import top.flobby.share.user.domain.entity.User;
 import top.flobby.share.user.domain.vo.UserLoginVO;
+import top.flobby.share.user.mapper.BonusEventLogMapper;
 import top.flobby.share.user.mapper.UserMapper;
 
 import java.util.Date;
@@ -26,6 +30,8 @@ public class UserService {
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private BonusEventLogMapper bonusEventLogMapper;
 
     public Long count() {
         return userMapper.selectCount(null);
@@ -89,7 +95,40 @@ public class UserService {
         return newUser.getId();
     }
 
+
+    /**
+     * 根据id获取user
+     *
+     * @param id id
+     * @return {@link User}
+     */
     public User getUserById(Long id) {
         return userMapper.selectById(id);
+    }
+
+    /**
+     * 更新积分
+     *
+     * @param bonusDTO dto
+     * @return {@link User}
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public User updateUserBonus(UpdateBonusDTO bonusDTO) {
+        // 获取数据
+        User user = userMapper.selectById(bonusDTO.getUserId());
+        Integer bonus = bonusDTO.getBonus();
+        // 更新数据
+        user.setBonus(user.getBonus() + bonus);
+        userMapper.updateById(user);
+        // 积分日志
+        bonusEventLogMapper.insert(BonusEventLog.builder()
+                .id(SnowUtil.getSnowflakeNextId())
+                .userId(bonusDTO.getUserId())
+                .value(bonus)
+                .event(bonusDTO.getEvent())
+                .description(bonusDTO.getDesc())
+                .createTime(new Date())
+                .build());
+        return user;
     }
 }

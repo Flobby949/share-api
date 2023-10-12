@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import top.flobby.share.common.resp.CommonResp;
 import top.flobby.share.user.domain.dto.LoginDTO;
+import top.flobby.share.user.domain.dto.UpdateBonusDTO;
 import top.flobby.share.user.domain.entity.User;
 import top.flobby.share.user.domain.vo.UserLoginVO;
 import top.flobby.share.user.service.UserService;
@@ -41,5 +42,10 @@ public class UserController {
     @GetMapping("{id}")
     public CommonResp<User> getUserById(@PathVariable Long id) {
         return CommonResp.success(userService.getUserById(id));
+    }
+
+    @PutMapping("bonus")
+    public CommonResp<User> updateBonus(@RequestBody UpdateBonusDTO updateBonusDTO) {
+        return CommonResp.success(userService.updateUserBonus(updateBonusDTO));
     }
 }

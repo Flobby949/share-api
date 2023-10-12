@@ -7,11 +7,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.flobby.share.common.enums.AuditStatusEnum;
+import top.flobby.share.common.util.SnowUtil;
+import top.flobby.share.content.domain.dto.ExchangeDTO;
 import top.flobby.share.content.domain.entity.MidUserShare;
 import top.flobby.share.content.domain.entity.Share;
 import top.flobby.share.content.domain.vo.ShareVO;
 import top.flobby.share.content.feign.UserService;
+import top.flobby.share.content.feign.model.UpdateBonusDTO;
 import top.flobby.share.content.feign.model.User;
 import top.flobby.share.content.mapper.MidUserShareMapper;
 import top.flobby.share.content.mapper.ShareMapper;
@@ -83,6 +87,12 @@ public class ShareService {
         return sharesDeal;
     }
 
+    /**
+     * 获取咨询内容信息
+     *
+     * @param id id
+     * @return {@link ShareVO}
+     */
     public ShareVO getShareById(Long id) {
         Share share = shareMapper.selectById(id);
         User publisher = userService.getUserById(share.getUserId()).getData();
@@ -91,6 +101,41 @@ public class ShareService {
                 .nickname(publisher.getNickname())
                 .avatarUrl(publisher.getAvatarUrl())
                 .build();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Share exchangeShare(ExchangeDTO exchangeDTO) {
+        // 查询信息
+        Share share = shareMapper.selectById(exchangeDTO.getShareId());
+        if (share == null) {
+            throw new IllegalArgumentException("资源不存在！");
+        }
+        User user = userService.getUserById(exchangeDTO.getUserId()).getData();
+        // 用户是否兑换过
+        MidUserShare midUserShare = midUserShareMapper.selectOne(new QueryWrapper<MidUserShare>().lambda()
+                        .eq(MidUserShare::getUserId, exchangeDTO.getUserId())
+                        .eq(MidUserShare::getShareId, exchangeDTO.getShareId()));
+        if (midUserShare != null) {
+            return share;
+        }
+        // 判断用户积分是否足够兑换
+        if (user.getBonus() < share.getBuyCount()) {
+            throw new IllegalArgumentException("用户积分不足！");
+        }
+        // 更新用户积分
+        userService.updateBonus(UpdateBonusDTO.builder()
+                        .bonus(share.getPrice() * -1)
+                        .desc("兑换分享")
+                        .event("BUY")
+                        .userId(exchangeDTO.getUserId())
+                .build());
+        // 插入关联表数据
+        midUserShareMapper.insert(MidUserShare.builder()
+                        .id(SnowUtil.getSnowflakeNextId())
+                        .shareId(exchangeDTO.getShareId())
+                        .userId(exchangeDTO.getUserId())
+                .build());
+        return share;
     }
 
 }
