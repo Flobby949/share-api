@@ -6,12 +6,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.flobby.share.common.enums.AuditStatusEnum;
 import top.flobby.share.common.util.SnowUtil;
 import top.flobby.share.content.domain.dto.ExchangeDTO;
+import top.flobby.share.content.domain.dto.ShareAuditDTO;
 import top.flobby.share.content.domain.dto.ShareSubmitDTO;
+import top.flobby.share.content.domain.dto.UpdateBonusMqDTO;
 import top.flobby.share.content.domain.entity.MidUserShare;
 import top.flobby.share.content.domain.entity.Share;
 import top.flobby.share.content.domain.vo.ShareVO;
@@ -23,6 +26,7 @@ import top.flobby.share.content.mapper.ShareMapper;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author : Flobby
@@ -41,11 +45,13 @@ public class ShareService {
     private MidUserShareMapper midUserShareMapper;
     @Resource
     private UserService userService;
+    @Resource
+    private RocketMQTemplate rocketMQTemplate;
 
     /**
      * 查询用户可查看的资源列表
      *
-     * @param title title
+     * @param title  title
      * @param userId userId
      * @return {@link List}<{@link Share}>
      */
@@ -59,7 +65,7 @@ public class ShareService {
             wrapper.like(Share::getTitle, title);
         }
         // 过滤出所有已经通过审核的数据并需要显示的数据
-        wrapper.eq(Share::getAuditStatus, AuditStatusEnum.PASSED.getDesc()).eq(Share::getShowFlag, true);
+        wrapper.eq(Share::getAuditStatus, AuditStatusEnum.PASS.toString()).eq(Share::getShowFlag, true);
 
         // 分页器
         Page<Share> page = Page.of(pageNo, pageSize);
@@ -121,8 +127,8 @@ public class ShareService {
         User user = userService.getUserById(exchangeDTO.getUserId()).getData();
         // 用户是否兑换过
         MidUserShare midUserShare = midUserShareMapper.selectOne(new QueryWrapper<MidUserShare>().lambda()
-                        .eq(MidUserShare::getUserId, exchangeDTO.getUserId())
-                        .eq(MidUserShare::getShareId, exchangeDTO.getShareId()));
+                .eq(MidUserShare::getUserId, exchangeDTO.getUserId())
+                .eq(MidUserShare::getShareId, exchangeDTO.getShareId()));
         if (midUserShare != null) {
             return share;
         }
@@ -132,16 +138,16 @@ public class ShareService {
         }
         // 更新用户积分
         userService.updateBonus(UpdateBonusDTO.builder()
-                        .bonus(share.getPrice() * -1)
-                        .desc("兑换分享")
-                        .event("BUY")
-                        .userId(exchangeDTO.getUserId())
+                .bonus(share.getPrice() * -1)
+                .desc("兑换分享")
+                .event("BUY")
+                .userId(exchangeDTO.getUserId())
                 .build());
         // 插入关联表数据
         midUserShareMapper.insert(MidUserShare.builder()
-                        .id(SnowUtil.getSnowflakeNextId())
-                        .shareId(exchangeDTO.getShareId())
-                        .userId(exchangeDTO.getUserId())
+                .id(SnowUtil.getSnowflakeNextId())
+                .shareId(exchangeDTO.getShareId())
+                .userId(exchangeDTO.getUserId())
                 .build());
         return share;
     }
@@ -161,7 +167,7 @@ public class ShareService {
                 .downloadUrl(shareSubmitDTO.getDownloadUrl())
                 .buyCount(0)
                 .showFlag(false)
-                .auditStatus("NOT YET")
+                .auditStatus("NOT_YET")
                 .reason("暂未审核")
                 .build();
         return shareMapper.insert(share);
@@ -170,9 +176,9 @@ public class ShareService {
     /**
      * 分页查询我的投稿
      *
-     * @param userId userId
+     * @param userId   userId
      * @param pageSize pageSize
-     * @param pageNo pageNo
+     * @param pageNo   pageNo
      * @return {@link List}<{@link Share}>
      */
     public List<Share> myContributeList(Long userId, Integer pageSize, Integer pageNo) {
@@ -186,7 +192,7 @@ public class ShareService {
      * 分页查询待审核列表
      *
      * @param pageSize pageSize
-     * @param pageNo pageNo
+     * @param pageNo   pageNo
      * @return {@link List}<{@link Share}>
      */
     public List<Share> notPassShareList(Integer pageSize, Integer pageNo) {
@@ -194,6 +200,38 @@ public class ShareService {
         wrapper.eq(Share::getAuditStatus, AuditStatusEnum.NOT_YET).eq(Share::getShowFlag, false);
         Page<Share> page = Page.of(pageNo, pageSize);
         return shareMapper.selectList(page, wrapper);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public Share auditById(Long shareId, ShareAuditDTO shareAuditDTO) {
+        // 查看share是否存在
+        Share share = shareMapper.selectById(shareId);
+        if (share == null) {
+            throw new IllegalArgumentException("非法参数，资源不存在");
+        }
+        if (!Objects.equals("NOT_YET", share.getAuditStatus())) {
+            throw new IllegalArgumentException("非法参数，该分享已被审核");
+        }
+        // 审核资源
+        share.setAuditStatus(shareAuditDTO.getAuditStatusEnum().toString());
+        share.setReason(shareAuditDTO.getReason());
+        share.setShowFlag(shareAuditDTO.getShowFlag());
+        shareMapper.updateById(share);
+        // 向 关联表 插入数据
+        midUserShareMapper.insert(MidUserShare.builder()
+                .id(SnowUtil.getSnowflakeNextId())
+                .userId(share.getUserId())
+                .shareId(shareId)
+                .build());
+        // 如果是 PASS 那么发送消息给 mq，让用户中心去消费，并添加积分
+        if (AuditStatusEnum.PASS.equals(shareAuditDTO.getAuditStatusEnum())) {
+            rocketMQTemplate.convertAndSend("add-bonus", UpdateBonusMqDTO.builder()
+                    .userId(share.getUserId())
+                    .bonus(50)
+                    .build());
+        }
+        return share;
     }
 
 }

@@ -3,7 +3,7 @@ server:
 #  servlet:
 #    context-path: /user-service
 
-spring:
+#spring:
 #  jackson:
 #    date-format: yyyy-MM-dd HH:mm:ss
 #    time-zone: Asia/Shanghai

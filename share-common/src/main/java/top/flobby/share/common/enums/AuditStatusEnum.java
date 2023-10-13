@@ -1,5 +1,6 @@
 package top.flobby.share.common.enums;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -10,14 +11,9 @@ import lombok.Getter;
  **/
 
 @Getter
+@AllArgsConstructor
 public enum AuditStatusEnum {
-    PASSED("PASS"),
-    NOT_YET("NOT_YET"),
-    REJECTED("REJECTED");
-
-    private final String desc;
-
-    AuditStatusEnum(String desc) {
-        this.desc = desc;
-    }
+    PASS,
+    NOT_YET,
+    REJECTED
 }

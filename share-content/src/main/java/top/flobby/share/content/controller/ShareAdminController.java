@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import top.flobby.share.common.resp.CommonResp;
 import top.flobby.share.common.util.JwtUtil;
+import top.flobby.share.content.domain.dto.ShareAuditDTO;
 import top.flobby.share.content.domain.entity.Share;
 import top.flobby.share.content.service.ShareService;
 
@@ -25,11 +26,17 @@ public class ShareAdminController {
     @GetMapping("list")
     public CommonResp<List<Share>> getSharesNotYet(@RequestParam(defaultValue = "1", required = false) Integer pageNo,
                                                    @RequestParam(defaultValue = "3", required = false) Integer pageSize,
-    @RequestHeader(value = "token")String token) {
+                                                   @RequestHeader(value = "token") String token) {
         String role = JwtUtil.getJSONObject(token).getStr("roles");
         if (!"admin".equals(role)) {
             return CommonResp.error("无权限");
         }
         return CommonResp.success(shareService.notPassShareList(pageSize, pageNo));
     }
+
+    @PostMapping("audit/{id}")
+    public CommonResp<Share> audit(@PathVariable Long id, @RequestBody ShareAuditDTO shareAuditDTO) {
+        return CommonResp.success(shareService.auditById(id, shareAuditDTO));
+    }
+
 }
