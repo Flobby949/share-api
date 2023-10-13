@@ -105,6 +105,12 @@ public class ShareService {
                 .build();
     }
 
+    /**
+     * 兑换资源
+     *
+     * @param exchangeDTO dto
+     * @return {@link Share}
+     */
     @Transactional(rollbackFor = Exception.class)
     public Share exchangeShare(ExchangeDTO exchangeDTO) {
         // 查询信息
@@ -159,6 +165,21 @@ public class ShareService {
                 .reason("暂未审核")
                 .build();
         return shareMapper.insert(share);
+    }
+
+    /**
+     * 分页查询我的投稿
+     *
+     * @param userId userId
+     * @param pageSize pageSize
+     * @param pageNo pageNo
+     * @return {@link List}<{@link Share}>
+     */
+    public List<Share> myContributeList(Long userId, Integer pageSize, Integer pageNo) {
+        LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Share::getUserId, userId);
+        Page<Share> page = Page.of(pageNo, pageSize);
+        return shareMapper.selectList(page, wrapper);
     }
 
 }

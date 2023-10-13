@@ -22,3 +22,8 @@ Content-Type: application/json
   "userId": 1,
   "shareId": 25
 }
+
+### 我的投稿
+GET http://localhost:8000/content-service/share/contributeList?pageNo=1&pageSize=10
+Accept: application/json
+token: {{ token }}

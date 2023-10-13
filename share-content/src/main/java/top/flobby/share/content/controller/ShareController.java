@@ -54,19 +54,6 @@ public class ShareController {
         return CommonResp.success(shareService.getList(title, pageNo, pageSize, getUserIdFromToken(token)));
     }
 
-    private long getUserIdFromToken(String token) {
-        long userId = 0;
-        String noToken = "no-token";
-        if (!noToken.equals(token)) {
-            JSONObject tokenObject = JwtUtil.getJSONObject(token);
-            log.info("解析到的 token 数据为：{}", tokenObject);
-            userId = tokenObject.getLong("id");
-        } else {
-            log.info("没有 token");
-        }
-        return userId;
-    }
-
     @GetMapping("{id}")
     public CommonResp<ShareVO> getShareById(@PathVariable Long id) {
         return CommonResp.success(shareService.getShareById(id));
@@ -80,8 +67,33 @@ public class ShareController {
     @PostMapping("contribute")
     public CommonResp<Integer> contribute(@RequestBody ShareSubmitDTO shareSubmitDTO,
                                           @RequestHeader(value = "token") String token) {
-        Long userId = JwtUtil.getJSONObject(token).getLong("token");
-        shareSubmitDTO.setUserId(userId);
+        shareSubmitDTO.setUserId(getUserIdFromToken(token));
         return CommonResp.success(shareService.contribute(shareSubmitDTO));
+    }
+
+
+    @GetMapping("contributeList")
+    public CommonResp<List<Share>> getContributeList(
+            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false, defaultValue = "5") Integer pageSize,
+            @RequestHeader(value = "token") String token
+    ) {
+        if (pageSize > MAX) {
+            pageSize = MAX;
+        }
+        return CommonResp.success(shareService.myContributeList(getUserIdFromToken(token), pageSize, pageNo));
+    }
+
+    private long getUserIdFromToken(String token) {
+        long userId = 0;
+        String noToken = "no-token";
+        if (!noToken.equals(token)) {
+            JSONObject tokenObject = JwtUtil.getJSONObject(token);
+            log.info("解析到的 token 数据为：{}", tokenObject);
+            userId = tokenObject.getLong("id");
+        } else {
+            log.info("没有 token");
+        }
+        return userId;
     }
 }
