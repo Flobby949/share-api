@@ -38,7 +38,7 @@ public class Share {
     /**
      * 是否原创 0:否 1:是
      */
-    private Byte isOriginal;
+    private Boolean isOriginal;
     /**
      * 作者
      */

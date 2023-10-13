@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import top.flobby.share.common.enums.AuditStatusEnum;
 import top.flobby.share.common.util.SnowUtil;
 import top.flobby.share.content.domain.dto.ExchangeDTO;
+import top.flobby.share.content.domain.dto.ShareSubmitDTO;
 import top.flobby.share.content.domain.entity.MidUserShare;
 import top.flobby.share.content.domain.entity.Share;
 import top.flobby.share.content.domain.vo.ShareVO;
@@ -20,6 +21,7 @@ import top.flobby.share.content.feign.model.User;
 import top.flobby.share.content.mapper.MidUserShareMapper;
 import top.flobby.share.content.mapper.ShareMapper;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -136,6 +138,27 @@ public class ShareService {
                         .userId(exchangeDTO.getUserId())
                 .build());
         return share;
+    }
+
+    public int contribute(ShareSubmitDTO shareSubmitDTO) {
+        Share share = Share.builder()
+                .id(SnowUtil.getSnowflakeNextId())
+                .userId(shareSubmitDTO.getUserId())
+                .title(shareSubmitDTO.getTitle())
+                .createTime(new Date())
+                .updateTime(new Date())
+                .isOriginal(shareSubmitDTO.getIsOriginal())
+                .author(shareSubmitDTO.getAuthor())
+                .cover(shareSubmitDTO.getCover())
+                .summary(shareSubmitDTO.getSummary())
+                .price(shareSubmitDTO.getPrice())
+                .downloadUrl(shareSubmitDTO.getDownloadUrl())
+                .buyCount(0)
+                .showFlag(false)
+                .auditStatus("NOT YET")
+                .reason("暂未审核")
+                .build();
+        return shareMapper.insert(share);
     }
 
 }

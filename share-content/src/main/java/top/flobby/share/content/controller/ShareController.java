@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import top.flobby.share.common.resp.CommonResp;
 import top.flobby.share.common.util.JwtUtil;
 import top.flobby.share.content.domain.dto.ExchangeDTO;
+import top.flobby.share.content.domain.dto.ShareSubmitDTO;
 import top.flobby.share.content.domain.entity.Notice;
 import top.flobby.share.content.domain.entity.Share;
 import top.flobby.share.content.domain.vo.ShareVO;
@@ -74,5 +75,13 @@ public class ShareController {
     @PostMapping("exchange")
     public CommonResp<Share> exchangeContent(@RequestBody @Valid ExchangeDTO exchangeDTO) {
         return CommonResp.success(shareService.exchangeShare(exchangeDTO));
+    }
+
+    @PostMapping("contribute")
+    public CommonResp<Integer> contribute(@RequestBody ShareSubmitDTO shareSubmitDTO,
+                                          @RequestHeader(value = "token") String token) {
+        Long userId = JwtUtil.getJSONObject(token).getLong("token");
+        shareSubmitDTO.setUserId(userId);
+        return CommonResp.success(shareService.contribute(shareSubmitDTO));
     }
 }
