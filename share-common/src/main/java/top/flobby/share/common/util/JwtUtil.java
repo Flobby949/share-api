@@ -26,7 +26,7 @@ public class JwtUtil {
      */
     private static final String KEY = "share-api";
 
-    public static String createToken(Long id, String phone) {
+    public static String createToken(Long id, String phone, String roles) {
         DateTime now = DateTime.now();
         // 超时时间
         DateTime expTime = now.offsetNew(DateField.HOUR, 48);
@@ -40,6 +40,7 @@ public class JwtUtil {
         // 内容
         payload.put("id", id);
         payload.put("phone", phone);
+        payload.put("roles", roles);
         String token = JWTUtil.createToken(payload, KEY.getBytes());
         log.info("生成 JWT token：{}", token);
         return token;
@@ -64,7 +65,7 @@ public class JwtUtil {
     }
 
     public static void main(String[] args) {
-        String token = createToken(1L, "18962521753");
+        String token = createToken(1L, "18962521753", "admin");
         System.out.println(token);
         validate(token);
         getJSONObject(token);

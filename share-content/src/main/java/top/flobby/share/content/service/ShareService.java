@@ -182,4 +182,18 @@ public class ShareService {
         return shareMapper.selectList(page, wrapper);
     }
 
+    /**
+     * 分页查询待审核列表
+     *
+     * @param pageSize pageSize
+     * @param pageNo pageNo
+     * @return {@link List}<{@link Share}>
+     */
+    public List<Share> notPassShareList(Integer pageSize, Integer pageNo) {
+        LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Share::getAuditStatus, AuditStatusEnum.NOT_YET).eq(Share::getShowFlag, false);
+        Page<Share> page = Page.of(pageNo, pageSize);
+        return shareMapper.selectList(page, wrapper);
+    }
+
 }

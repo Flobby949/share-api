@@ -57,7 +57,7 @@ public class UserService {
             throw new BusinessException(BusinessExceptionEnum.PASSWORD_ERROR);
         }
         // 登录成功
-        String token = JwtUtil.createToken(savedUser.getId(), savedUser.getPhone());
+        String token = JwtUtil.createToken(savedUser.getId(), savedUser.getPhone(), savedUser.getRoles());
 
         return UserLoginVO.builder()
                 .user(savedUser)
