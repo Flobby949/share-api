@@ -1,5 +1,7 @@
 package top.flobby.share.user.domain.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +24,7 @@ public class User {
     /**
      * 主键，雪花算法
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /**
      * 手机号

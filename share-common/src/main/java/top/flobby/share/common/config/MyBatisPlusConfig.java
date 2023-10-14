@@ -1,4 +1,4 @@
-package top.flobby.share.content.config;
+package top.flobby.share.common.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

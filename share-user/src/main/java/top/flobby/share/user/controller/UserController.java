@@ -55,7 +55,7 @@ public class UserController {
 
     @GetMapping("bonus")
     public CommonResp<List<BonusEventLog>> getUserBonusLog(@RequestParam(defaultValue = "1", required = false) Integer pageNo,
-                                                           @RequestParam(defaultValue = "8", required = false) Integer pageSize,
+                                                           @RequestParam(defaultValue = "10", required = false) Integer pageSize,
                                                            @RequestHeader(value = "token") String token) {
         return CommonResp.success(userService.userBonusLog(JwtUtil.getJSONObject(token).getLong("id"), pageSize, pageNo));
     }

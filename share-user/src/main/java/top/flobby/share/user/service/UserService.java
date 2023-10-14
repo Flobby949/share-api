@@ -146,8 +146,9 @@ public class UserService {
      */
     public List<BonusEventLog> userBonusLog(Long userId, Integer pageSize, Integer pageNo) {
         Page<BonusEventLog> page = Page.of(pageNo, pageSize);
-        return bonusEventLogMapper.selectList(page,
-                new LambdaQueryWrapper<BonusEventLog>().eq(BonusEventLog::getUserId, userId));
+        LambdaQueryWrapper<BonusEventLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(BonusEventLog::getUserId, userId);
+        return bonusEventLogMapper.selectList(page, wrapper);
     }
 
     /**

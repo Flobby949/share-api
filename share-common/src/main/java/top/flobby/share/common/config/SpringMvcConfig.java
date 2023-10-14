@@ -1,4 +1,4 @@
-package top.flobby.share.user.config;
+package top.flobby.share.common.config;
 
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
