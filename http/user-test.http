@@ -32,3 +32,14 @@ Content-Type: application/json
   "phone": "18962526666",
   "password": "123123"
 }
+
+### 积分明细
+GET http://localhost:8000/user-service/user/bonus
+Accept: application/json
+token: {{token}}
+
+
+### 签到
+POST http://localhost:8000/user-service/user/check
+Accept: application/json
+token: {{token}}

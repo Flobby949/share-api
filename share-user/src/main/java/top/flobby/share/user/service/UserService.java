@@ -1,6 +1,8 @@
 package top.flobby.share.user.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +18,9 @@ import top.flobby.share.user.domain.vo.UserLoginVO;
 import top.flobby.share.user.mapper.BonusEventLogMapper;
 import top.flobby.share.user.mapper.UserMapper;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author : Flobby
@@ -130,5 +134,64 @@ public class UserService {
                 .createTime(new Date())
                 .build());
         return user;
+    }
+
+    /**
+     * 积分明细
+     *
+     * @param userId id
+     * @param pageSize size
+     * @param pageNo no
+     * @return {@link List}<{@link BonusEventLog}>
+     */
+    public List<BonusEventLog> userBonusLog(Long userId, Integer pageSize, Integer pageNo) {
+        Page<BonusEventLog> page = Page.of(pageNo, pageSize);
+        return bonusEventLogMapper.selectList(page,
+                new LambdaQueryWrapper<BonusEventLog>().eq(BonusEventLog::getUserId, userId));
+    }
+
+    /**
+     * 签到
+     *
+     * @param userId id
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void dailyCheck(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户异常");
+        }
+        LambdaQueryWrapper<BonusEventLog> wrapper = new LambdaQueryWrapper<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        // 构造开始时间
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date start = calendar.getTime();
+        // 构造结束时间
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        Date end = calendar.getTime();
+        wrapper.eq(BonusEventLog::getUserId, userId).eq(BonusEventLog::getEvent, "DAILY_CHECK").between(BonusEventLog::getCreateTime, start, end);
+        // 查询今日是否签到
+        BonusEventLog bonusEventLog = bonusEventLogMapper.selectOne(wrapper);
+        if (bonusEventLog != null) {
+            throw new BusinessException(BusinessExceptionEnum.ALREADY_HAS_CHECK);
+        }
+        // 签到成功，插入数据
+        bonusEventLogMapper.insert(BonusEventLog.builder()
+                .id(SnowUtil.getSnowflakeNextId())
+                .userId(userId)
+                .value(10)
+                .event("DAILY_CHECK")
+                .description("签到")
+                .createTime(new Date())
+                .build());
+
+        // 添加积分
+        user.setBonus(user.getBonus() + 10);
+        userMapper.updateById(user);
     }
 }

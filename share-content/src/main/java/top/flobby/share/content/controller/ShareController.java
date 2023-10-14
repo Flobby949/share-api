@@ -84,6 +84,18 @@ public class ShareController {
         return CommonResp.success(shareService.myContributeList(getUserIdFromToken(token), pageSize, pageNo));
     }
 
+    @GetMapping("myExchangeList")
+    public CommonResp<List<Share>> getExchangeList(
+            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false, defaultValue = "5") Integer pageSize,
+            @RequestHeader(value = "token") String token
+    ) {
+        if (pageSize > MAX) {
+            pageSize = MAX;
+        }
+        return CommonResp.success(shareService.getMyExchange(getUserIdFromToken(token), pageSize, pageNo));
+    }
+
     private long getUserIdFromToken(String token) {
         long userId = 0;
         String noToken = "no-token";

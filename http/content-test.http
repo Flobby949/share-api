@@ -43,3 +43,8 @@ token: {{ token }}
   "reason": "通过审核",
   "showFlag": true
 }
+
+### 我的兑换
+GET http://localhost:8000/content-service/share/myExchangeList?pageNo=1&pageSize=10
+Accept: application/json
+token: {{ token }}

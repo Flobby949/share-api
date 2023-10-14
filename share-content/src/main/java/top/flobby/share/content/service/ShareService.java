@@ -234,4 +234,20 @@ public class ShareService {
         return share;
     }
 
+    /**
+     * 我的兑换
+     *
+     * @param userId id
+     * @param pageSize size
+     * @param pageNo no
+     * @return {@link List}<{@link Share}>
+     */
+    public List<Share> getMyExchange(Long userId, Integer pageSize, Integer pageNo) {
+        LambdaQueryWrapper<MidUserShare> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MidUserShare::getUserId, userId);
+        // 中间表数据
+        List<Long> idList = midUserShareMapper.selectList(Page.of(pageNo, pageSize), wrapper).stream().map(item -> item.getShareId()).toList();
+        return shareMapper.selectBatchIds(idList);
+    }
+
 }
