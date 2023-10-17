@@ -22,3 +22,18 @@ server:
 #logging:
 #  level:
 #    top.flobby.share.user.mapper: debug
+
+web:
+  custom-file-upload: E:\java-projects\share-api\share-user\src\main\resources\file\
+
+
+spring:
+  servlet:
+    multipart:
+      # -1 表示无限大
+      max-file-size: -1
+      max-request-size: -1
+  web:
+    resources:
+      # 默认有四个，重写配置后丢失默认路径
+      static-locations: classpath:/static/,file:${web.custom-file-upload}

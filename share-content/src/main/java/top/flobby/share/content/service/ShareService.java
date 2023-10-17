@@ -76,7 +76,7 @@ public class ShareService {
         // 处理后的 Share 数据列表
         List<Share> sharesDeal;
         // 1. 如果用户未登录，name downloadUrl 全部设为 null
-        if (userId == null) {
+        if (userId == 0) {
             sharesDeal = shares.stream().peek(share -> share.setDownloadUrl(null)).toList();
         }
         // 2. 如果用户登录了，那么查询 mid_user_share，如果没有数据，那么这条数据，那么这条 share 的 downloadUrl 也设为 null
