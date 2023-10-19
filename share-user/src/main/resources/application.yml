@@ -37,3 +37,19 @@ spring:
     resources:
       # 默认有四个，重写配置后丢失默认路径
       static-locations: classpath:/static/,file:${web.custom-file-upload}
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: default
+      packages-to-scan: top.flobby.share.user
+      paths-to-match: /**
+  swagger-ui:
+    operations-sorter: alpha
+    path: /swagger-ui.html
+    tags-sorter: alpha

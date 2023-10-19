@@ -22,3 +22,19 @@ server:
 #logging:
 #  level:
 #    top.flobby.share.user.mapper: debug
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: default
+      packages-to-scan: top.flobby.share.content
+      paths-to-match: /**
+  swagger-ui:
+    operations-sorter: alpha
+    path: /swagger-ui.html
+    tags-sorter: alpha

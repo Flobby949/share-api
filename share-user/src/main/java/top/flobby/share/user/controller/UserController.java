@@ -1,5 +1,7 @@
 package top.flobby.share.user.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -30,6 +32,7 @@ import java.util.UUID;
  **/
 
 @RestController
+@Tag(name = "用户中心接口")
 @RequestMapping("user")
 public class UserController {
 
@@ -37,11 +40,13 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("count")
+    @Operation(summary = "用户数量")
     public CommonResp<Long> count() {
         return CommonResp.success(userService.count());
     }
 
     @PostMapping("login")
+    @Operation(summary = "用户登录")
     public CommonResp<UserLoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         return CommonResp.success(userService.login(loginDTO));
     }

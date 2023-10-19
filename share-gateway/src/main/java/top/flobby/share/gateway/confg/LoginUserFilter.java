@@ -35,6 +35,7 @@ public class LoginUserFilter implements Ordered, GlobalFilter {
                 || path.contains(".jpg")
                 || path.contains(".png")
                 || path.contains(".gif")
+                || path.contains("doc")
         ) {
             log.info("不需要登录验证：{}", path);
             return chain.filter(exchange);
